@@ -1,0 +1,39 @@
+name: Deploy Izinto
+
+on:
+  push:
+    branches: [ master ]
+
+# Minimal permissions required for Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Enable Corepack and install dependencies
+        run: |
+          corepack enable
+          pnpm install
+
+      - name: Build
+        run: pnpm build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: dist
+
+      - name: Publish to GitHub Pages
+        uses: actions/deploy-pages@v1
